@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: ./backend
+    container_name: kumagram-backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # 컨테이너가 재시작되어도 DB가 날아가지 않도록 /app/data 볼륨 안에 SQLite 파일 저장
+      - DATABASE_URL=sqlite:////app/data/kumastagram.db
+    volumes:
+      - ./data/db:/app/data
+      - ./data/uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    container_name: kumagram-frontend
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
