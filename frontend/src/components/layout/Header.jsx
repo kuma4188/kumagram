@@ -5,32 +5,31 @@ export default function Header() {
   const navigate = useNavigate();
 
   // 2024년 8월 17일 기준 사귄 일수 및 기념일(100일 단위 / N주년) 계산 로직
+// 접속 지역 기준 사귄 일수 및 기념일(100일 단위 / N주년) 계산 로직
   const getAnniversaryInfo = () => {
-    const startDate = new Date("2024-08-17T00:00:00+09:00");
     const today = new Date();
 
-    // 시간 오차를 없애기 위해 한국 시간(KST) 기준 연/월/일만 추출하여 일수 계산
-    const startUTC = Date.UTC(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate()
-    );
-    const todayUTC = Date.UTC(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
+    // 1. 접속 기기의 현지 날짜(연/월/일) 추출
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth(); // 0-indexed (8월은 7)
+    const currentDate = today.getDate();
 
+    // 2. 사귄 시작일(2024-08-17)과 오늘을 각각 순수 날짜(UTC 자정 기준)로 정규화
+    //    시간/시차 오프셋 없이 날짜(Date) 차이만 계산하기 위함
+    const startUTC = Date.UTC(2024, 7, 17); // 2024년 8월 17일
+    const todayUTC = Date.UTC(currentYear, currentMonth, currentDate);
+
+    // 사귄 당일을 1일로 계산 (+1)
     const days = Math.floor((todayUTC - startUTC) / (1000 * 60 * 60 * 24)) + 1;
 
-    // 1. N주년 체크 (매년 8월 17일)
+    // 3. N주년 체크 (접속 지역의 현지 날짜가 8월 17일인 경우)
     const isYearlyAnniversary =
-      today.getMonth() === 7 && // JS에서 8월은 인덱스 7 (0부터 시작)
-      today.getDate() === 17 &&
-      today.getFullYear() > 2024;
-    const years = today.getFullYear() - 2024;
+      currentMonth === 7 &&
+      currentDate === 17 &&
+      currentYear > 2024;
+    const years = currentYear - 2024;
 
-    // 2. 100일 배수 체크 (100일, 200일, ..., 800일 등)
+    // 4. 100일 배수 체크 (100일, 200일...)
     const isHundredMilestone = days > 0 && days % 100 === 0;
 
     // 영어 서수 접미사(1st, 2nd, 3rd, 4th...) 생성 헬퍼
