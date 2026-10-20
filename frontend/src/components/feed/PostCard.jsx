@@ -195,20 +195,31 @@ export default function PostCard({ post: initialPost, onOpenComment, onPostDelet
       setIsSaving(false);
     }
   };
+// 작성 시간 상대 표기
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return "";
 
-  // 작성 시간 상대 표기
-  const formatTimeAgo = (dateStr) => {
-    const created = new Date(dateStr);
-    const now = new Date();
-    const diffSec = Math.floor((now - created) / 1000);
-    if (diffSec < 60) return "Just now";
-    const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `${diffMin}m ago`;
-    const diffHour = Math.floor(diffMin / 60);
-    if (diffHour < 24) return `${diffHour}h ago`;
-    const diffDay = Math.floor(diffHour / 24);
-    return `${diffDay}d ago`;
-  };
+  // 문자열 끝에 Z나 타임존(+00:00 등)이 없으면 UTC로 인식하도록 'Z' 추가
+  const safeDateStr = (dateStr.endsWith("Z") || dateStr.includes("+"))
+    ? dateStr
+    : `${dateStr}Z`;
+
+  const created = new Date(safeDateStr);
+  const now = new Date();
+  const diffSec = Math.floor((now - created) / 1000);
+
+  // 미래 시간으로 잡혀 음수가 나오는 경우 방지
+  if (diffSec < 60) return "Just now";
+
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}d ago`;
+};
 
   const getBadgeLabel = (type) => {
     switch (type) {
