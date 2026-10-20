@@ -253,7 +253,21 @@ export default function ProfilePage() {
               Following
             </button>
             <button
-              onClick={() => window.open("https://wa.me/62895332445650", "_blank")}
+              onClick={() => {
+                // 대소문자 차이 방지를 위해 toLowerCase() 처리
+                const target = profile.username?.toLowerCase();
+
+                if (target === "cherish") {
+                  // Cherish의 프로필을 보고 있을 때 (Lucas가 누르는 링크)
+                  window.open("https://wa.me/62895332445650", "_blank");
+                } else if (target === "lucas") {
+                  // Lucas의 프로필을 보고 있을 때 (Cherish가 누르는 링크 - Lucas 번호 또는 오픈카톡/링크)
+                  window.open("https://wa.me/821095804188", "_blank"); 
+                } else {
+                  // 혹시 모를 기본값
+                  window.open("https://wa.me/62895332445650", "_blank");
+                }
+              }}
               className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-900"
             >
               Message
