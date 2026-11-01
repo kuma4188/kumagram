@@ -4,13 +4,33 @@ import api from "../../api/client";
 
 const BACKEND_URL = "";
 
+// 작성 시간 상대 표기 함수 추가
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return "";
+
+  const safeDateStr = (dateStr.endsWith("Z") || dateStr.includes("+"))
+    ? dateStr
+    : `${dateStr}Z`;
+
+  const created = new Date(safeDateStr);
+  const now = new Date();
+  const diffSec = Math.floor((now - created) / 1000);
+
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+  const diffDay = Math.floor(diffHour / 24);
+  return `${diffDay}d ago`;
+};
+
 export default function CommentSheet({ postId, isOpen, onClose, onCommentCountChange }) {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editContent, setEditContent] = useState("");
 
-  // 모달이 열릴 때마다 해당 게시물의 댓글 목록 로드
   const fetchComments = async () => {
     if (!postId) return;
     try {
@@ -30,7 +50,6 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
 
   if (!isOpen) return null;
 
-  // 새 댓글 등록
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -43,7 +62,6 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
     }
   };
 
-  // 본인 댓글 수정 저장
   const handleSaveEdit = async (commentId) => {
     if (!editContent.trim()) return;
     try {
@@ -55,7 +73,6 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
     }
   };
 
-  // 본인 댓글 삭제
   const handleDelete = async (commentId) => {
     if (!window.confirm("Delete this comment?")) return;
     try {
@@ -68,12 +85,9 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-end bg-black/50 backdrop-blur-xs">
-      {/* 배경 클릭 시 닫기 영역 */}
       <div className="absolute inset-0" onClick={onClose} />
 
-      {/* 바텀 시트 본체 */}
       <div className="relative w-full max-w-md bg-white rounded-t-3xl h-[65vh] flex flex-col shadow-2xl z-10 animate-slide-up">
-        {/* 상단 핸들바 & 타이틀 */}
         <div className="p-4 border-b border-gray-100 flex items-center justify-between">
           <div className="w-6" />
           <div className="flex flex-col items-center">
@@ -85,7 +99,6 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
           </button>
         </div>
 
-        {/* 댓글 목록 스크롤 영역 */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {comments.length === 0 ? (
             <div className="text-center text-xs text-gray-400 py-12">
@@ -106,10 +119,16 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-gray-900">
-                        {c.author.username}
-                      </span>
-                      {/* 내가 쓴 댓글일 때만 수정/삭제 아이콘 노출 */}
+                      {/* 유저 이름과 시간 표시 영역 */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-gray-900">
+                          {c.author.username}
+                        </span>
+                        <span className="text-[10px] text-gray-400">
+                          {formatTimeAgo(c.created_at)}
+                        </span>
+                      </div>
+                      
                       {c.is_mine && editingId !== c.id && (
                         <div className="flex items-center gap-2 text-gray-400">
                           <button
@@ -164,7 +183,6 @@ export default function CommentSheet({ postId, isOpen, onClose, onCommentCountCh
           )}
         </div>
 
-        {/* 하단 댓글 입력창 */}
         <form
           onSubmit={handleAddComment}
           className="p-3 border-t border-gray-100 flex items-center gap-2 bg-white"
