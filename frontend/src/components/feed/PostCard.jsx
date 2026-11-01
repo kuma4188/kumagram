@@ -199,7 +199,6 @@ export default function PostCard({ post: initialPost, onOpenComment, onPostDelet
 const formatTimeAgo = (dateStr) => {
   if (!dateStr) return "";
 
-  // 문자열 끝에 Z나 타임존(+00:00 등)이 없으면 UTC로 인식하도록 'Z' 추가
   const safeDateStr = (dateStr.endsWith("Z") || dateStr.includes("+"))
     ? dateStr
     : `${dateStr}Z`;
@@ -208,7 +207,6 @@ const formatTimeAgo = (dateStr) => {
   const now = new Date();
   const diffSec = Math.floor((now - created) / 1000);
 
-  // 미래 시간으로 잡혀 음수가 나오는 경우 방지
   if (diffSec < 60) return "Just now";
 
   const diffMin = Math.floor(diffSec / 60);
@@ -217,8 +215,12 @@ const formatTimeAgo = (dateStr) => {
   const diffHour = Math.floor(diffMin / 60);
   if (diffHour < 24) return `${diffHour}h ago`;
 
-  const diffDay = Math.floor(diffHour / 24);
-  return `${diffDay}d ago`;
+  // 24시간이 지난 경우 날짜 형식(YYYY.MM.DD)으로 출력
+  const year = created.getFullYear();
+  const month = String(created.getMonth() + 1).padStart(2, '0');
+  const day = String(created.getDate()).padStart(2, '0');
+  
+  return `${year}.${month}.${day}`;
 };
 
   const getBadgeLabel = (type) => {

@@ -17,12 +17,19 @@ const formatTimeAgo = (dateStr) => {
   const diffSec = Math.floor((now - created) / 1000);
 
   if (diffSec < 60) return "Just now";
+
   const diffMin = Math.floor(diffSec / 60);
   if (diffMin < 60) return `${diffMin}m ago`;
+
   const diffHour = Math.floor(diffMin / 60);
   if (diffHour < 24) return `${diffHour}h ago`;
-  const diffDay = Math.floor(diffHour / 24);
-  return `${diffDay}d ago`;
+
+  // 24시간이 지난 경우 날짜 형식(YYYY.MM.DD)으로 출력
+  const year = created.getFullYear();
+  const month = String(created.getMonth() + 1).padStart(2, '0');
+  const day = String(created.getDate()).padStart(2, '0');
+  
+  return `${year}.${month}.${day}`;
 };
 
 export default function CommentSheet({ postId, isOpen, onClose, onCommentCountChange }) {
