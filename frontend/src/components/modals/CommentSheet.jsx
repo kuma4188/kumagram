@@ -24,12 +24,14 @@ const formatTimeAgo = (dateStr) => {
   const diffHour = Math.floor(diffMin / 60);
   if (diffHour < 24) return `${diffHour}h ago`;
 
-  // 24시간이 지난 경우 날짜 형식(YYYY.MM.DD)으로 출력
+  // 24시간이 지난 경우 날짜 및 시간 형식(YYYY.MM.DD HH:mm)으로 출력
   const year = created.getFullYear();
   const month = String(created.getMonth() + 1).padStart(2, '0');
   const day = String(created.getDate()).padStart(2, '0');
+  const hours = String(created.getHours()).padStart(2, '0');
+  const minutes = String(created.getMinutes()).padStart(2, '0');
   
-  return `${year}.${month}.${day}`;
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
 };
 
 export default function CommentSheet({ postId, isOpen, onClose, onCommentCountChange }) {
